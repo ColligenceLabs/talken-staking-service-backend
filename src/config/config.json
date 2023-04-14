@@ -1,0 +1,26 @@
+{
+  "development": {
+    "use_env_variable": "PG_HOST",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "timezone": "Asia/Seoul",
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  },
+  "production": {
+    "use_env_variable": "PG_HOST",
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "timezone": "Asia/Seoul",
+    "pool": {
+      "max": 20,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  }
+}
