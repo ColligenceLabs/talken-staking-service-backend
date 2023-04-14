@@ -18,20 +18,54 @@ const {getWeb3} = require('../../utils/helper');
 const web3 = getWeb3();
 
 const contracts = [
-  // '0xAbC6b607Ed1Abd2491441c63c3F9100f90644d98', // StKlay
+  '0xAbC6b607Ed1Abd2491441c63c3F9100f90644d98', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
-  '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40', // NodeHandler
 ];
 
-function parseClaimReward(eventData) {
-  if (eventData.topics[0] == '0x106f923f993c2149d49b4255ff723acafa1f2d94393f561d3eda32ae348f7241') {
+function parseSharesChanged(eventData) {
+  // StKlay Event : SharesChanged(address,uint256,uint256)
+  if (eventData.topics[0] == '0xbe88f7e04cdfbf2eea1bad888fccf5cafb7ce21001180cdbb197cdd0707f6a41') {
     let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(['address', 'uint256'], eventData.data);
+    const data = web3.eth.abi.decodeParameters(['uint256', 'uint256'], eventData.data);
 
-    let reward = parseInt(data[1]);
-    console.log('!! reward =', reward);
+    let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
+    let prevShares = data[0];
+    let shares = data[1];
+    console.log('!! SharesChanged : ', user, prevShares, shares);
+
     let transactionHash = eventData.transactionHash;
   }
+}
+
+function parseRestakedFromManager(eventData) {
+  // StKlay Event : RestakedFromManager(uint256,uint256,uint256)
+  if (eventData.topics[0] == '0xf9e3f4952630fac2a21a3bbf99e3b85d34e863754836adfd453ffbd205bbe1d7') {
+    let contractAddress = eventData.address.toLowerCase();
+    const data = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], eventData.data);
+
+    let totalRestaked = parseInt(data[0]);
+    let amount = parseInt(data[1]);
+    let totalStaking = parseInt(data[2]);
+    console.log('!! RestakedFromManager : ', totalRestaked, amount, totalStaking);
+
+    let transactionHash = eventData.transactionHash;
+  }
+  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256)
+  // if (eventData.topics[0] == '0xbe925ea73f84fbf40768382f9842e5041363e6983747d2c6c9f6d3a377265764') {
+  //   let contractAddress = eventData.address.toLowerCase();
+  //   const data = web3.eth.abi.decodeParameters(
+  //     ['uint256', 'uint256', 'uint256', 'uint256'],
+  //     eventData.data,
+  //   );
+  //
+  //   let totalRestaked = parseInt(data[0]);
+  //   let amount = parseInt(data[1]);
+  //   let totalStaking = parseInt(data[2]);
+  //   let totalShares = parseInt(data[3]);
+  //   console.log('!! RestakedFromManager : ', totalRestaked, amount, totalStaking, totalShares);
+  //
+  //   let transactionHash = eventData.transactionHash;
+  // }
 }
 
 exports.getLastEvents = async function (toBlock, chainName) {
@@ -42,10 +76,10 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 119803059, toBlock: 119803059, address: contracts},
+        {fromBlock: 119794317, toBlock: 119803790, address: contracts},
         async (err, result) => {
           if (!err) {
-            console.log(result);
+            // console.log(result);
             lastBlock.blocknumber = toBlock + 1;
             await lastBlock.save();
             console.log(chainName + ' event last block update complete.', lastBlock.blocknumber);
@@ -55,7 +89,8 @@ exports.getLastEvents = async function (toBlock, chainName) {
                 let contract = result[i].address;
                 let contractAddress = contract.toLowerCase();
                 if (result[i].topics) {
-                  parseClaimReward(result[i]);
+                  parseSharesChanged(result[i]);
+                  parseRestakedFromManager(result[i]);
                 }
               }
             }
