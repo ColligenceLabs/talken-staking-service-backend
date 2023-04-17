@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
     amount: {
       type: Sequelize.STRING,
     },
+    increase: {
+      type: Sequelize.STRING,
+    },
     tx_hash: {
       type: Sequelize.STRING,
     },
