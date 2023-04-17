@@ -19,7 +19,7 @@ const web3 = getWeb3();
 const {BigNumber} = require('@ethersproject/bignumber');
 
 const contracts = [
-  '0xA7E93a1BAcB06911B471e2d5017492506e513d7C', // StKlay
+  '0xdE120C0f30daE7C6525De890436Dc99217E0326F', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
