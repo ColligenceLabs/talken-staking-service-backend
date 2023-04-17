@@ -32,7 +32,7 @@ sequelize.logging = console;
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.rewards = require('./rewards')(sequelize, Sequelize);
+db.histories = require('./histories')(sequelize, Sequelize);
 db.lastblock = require('./lastblock')(sequelize, Sequelize);
 
 module.exports = db;
