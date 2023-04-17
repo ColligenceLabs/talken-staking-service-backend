@@ -8,17 +8,23 @@ module.exports = (sequelize, Sequelize) => {
             type: {
                 type: Sequelize.STRING,
             },
-            change: {
-                type: Sequelize.INTEGER,
+            wallet: {
+                type: Sequelize.STRING,
             },
-            change_usd: {
-                type: Sequelize.INTEGER,
+            prev_shares: {
+                type: Sequelize.STRING,
             },
-            apr: {
-                type: Sequelize.JSON,
+            shares: {
+                type: Sequelize.STRING,
             },
-            balance: {
-                type: Sequelize.BOOLEAN,
+            amount: {
+                type: Sequelize.STRING,
+            },
+            tx_hash: {
+                type: Sequelize.STRING,
+            },
+            block_number: {
+                type: Sequelize.BIGINT,
             },
             createdAt: {
                 type: Sequelize.DATE
