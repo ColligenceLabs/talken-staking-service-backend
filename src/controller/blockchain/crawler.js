@@ -53,10 +53,10 @@ function parseRestakedFromManager(eventData) {
     let totalStaking = data[2];
     let totalShares = data[3];
 
-    const reward = BigNumber.from(data[1].toString())
-      .mul(BigNumber.from('1000000000000000000000000000')) // <-- prevShares
-      .div(BigNumber.from(data[3].toString())); // = 8.8 Klay
-    console.log('!! reward = ', reward.toString());
+    // const reward = BigNumber.from(data[1].toString())
+    //   .mul(BigNumber.from('1000000000000000000000000000')) // <-- prevShares
+    //   .div(BigNumber.from(data[3].toString())); // = 8.8 Klay
+    // console.log('!! reward = ', reward.toString());
 
     console.log('!! RestakedFromManager : ', totalRestaked, amount, totalStaking, totalShares);
 
