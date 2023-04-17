@@ -24,16 +24,20 @@ const contracts = [
 ];
 
 function parseSharesChanged(eventData) {
-  // StKlay Event : SharesChanged(address,uint256,uint256,uint256,ChangeState)
+  // StKlay Event : SharesChanged(address,uint256,uint256,uint256,uint8)
   if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
     let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], eventData.data);
+    const data = web3.eth.abi.decodeParameters(
+      ['uint256', 'uint256', 'uint256', 'uint8'],
+      eventData.data,
+    );
 
     let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
     let prevShares = data[0];
     let shares = data[1];
     let amount = data[2];
-    console.log('!! SharesChanged : ', user, prevShares, shares, amount);
+    let changeType = data[3]; // 1 stake, 2 unstake, 3 cancel, 4 transfer
+    console.log('!! SharesChanged : ', user, prevShares, shares, amount, changeType);
 
     let transactionHash = eventData.transactionHash;
   }
