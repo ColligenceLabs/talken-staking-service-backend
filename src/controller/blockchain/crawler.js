@@ -19,13 +19,13 @@ const web3 = getWeb3();
 const {BigNumber} = require('@ethersproject/bignumber');
 
 const contracts = [
-  '0xdE120C0f30daE7C6525De890436Dc99217E0326F', // StKlay
-  '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
+  '0x8c5A4e17870E880166B910214F56057FBA8420E3', // StKlay
+  // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
 function parseSharesChanged(eventData) {
-  // StKlay Event : SharesChanged(address,uint256,uint256,uint256)
-  if (eventData.topics[0] == '0xfb30a38da9eea4744f3c4f9105d3ad69de0c499f53b177fce3e4fbcb5452551e') {
+  // StKlay Event : SharesChanged(address,uint256,uint256,uint256,ChangeState)
+  if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
     let contractAddress = eventData.address.toLowerCase();
     const data = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], eventData.data);
 
@@ -72,7 +72,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 120116368, toBlock: 120120706, address: contracts},
+        {fromBlock: 120122161, toBlock: 120122376, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
