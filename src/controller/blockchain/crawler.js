@@ -58,7 +58,7 @@ async function parseSharesChanged(eventData) {
   }
 }
 
-function parseRestakedFromManager(eventData) {
+async function parseRestakedFromManager(eventData) {
   // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256)
   if (eventData.topics[0] == '0xbe925ea73f84fbf40768382f9842e5041363e6983747d2c6c9f6d3a377265764') {
     let contractAddress = eventData.address.toLowerCase();
@@ -71,6 +71,7 @@ function parseRestakedFromManager(eventData) {
     let amount = data[1];
     let totalStaking = data[2];
     let totalShares = data[3];
+    let transactionHash = eventData.transactionHash;
 
     // const reward = BigNumber.from(data[1].toString())
     //   .mul(BigNumber.from('1000000000000000000000000000')) // <-- prevShares
@@ -79,7 +80,11 @@ function parseRestakedFromManager(eventData) {
 
     console.log('!! RestakedFromManager : ', totalRestaked, amount, totalStaking, totalShares);
 
-    let transactionHash = eventData.transactionHash;
+    try {
+      await models.rewards.createRewards(eventData.blockNumber, transactionHash, amount, totalShares);
+    } catch (e) {
+      console.log('createRewards error', e);
+    }
   }
 }
 
@@ -104,8 +109,8 @@ exports.getLastEvents = async function (toBlock, chainName) {
                 let contract = result[i].address;
                 let contractAddress = contract.toLowerCase();
                 if (result[i].topics) {
-                  parseSharesChanged(result[i]);
-                  parseRestakedFromManager(result[i]);
+                  await parseSharesChanged(result[i]);
+                  await parseRestakedFromManager(result[i]);
                 }
               }
             }
