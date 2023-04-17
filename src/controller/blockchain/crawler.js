@@ -17,10 +17,10 @@ const models = require('../../models');
 const {getWeb3} = require('../../utils/helper');
 const web3 = getWeb3();
 const {BigNumber} = require('@ethersproject/bignumber');
-const {types} = require("../../config/constants");
+const {types} = require('../../config/constants');
 
 const contracts = [
-  '0x99f2a8cf094345DD5C07A61dA6E1f32b7FCBeA23', // StKlay
+  '0xB52d73B2f86D63E1F707aC32cFD697fff2937954', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
@@ -59,18 +59,19 @@ async function parseSharesChanged(eventData) {
 }
 
 async function parseRestakedFromManager(eventData) {
-  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256)
-  if (eventData.topics[0] == '0xbe925ea73f84fbf40768382f9842e5041363e6983747d2c6c9f6d3a377265764') {
+  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
+  if (eventData.topics[0] == '0x47c355b9d84fb97b1b36daa506b9fc8f856bb70659ec082640a13dc944dee214') {
     let contractAddress = eventData.address.toLowerCase();
     const data = web3.eth.abi.decodeParameters(
-      ['uint256', 'uint256', 'uint256', 'uint256'],
+      ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
       eventData.data,
     );
 
     let totalRestaked = data[0];
     let amount = data[1];
-    let totalStaking = data[2];
-    let totalShares = data[3];
+    let increase = data[2];
+    let totalStaking = data[3];
+    let totalShares = data[4];
     let transactionHash = eventData.transactionHash;
 
     // const reward = BigNumber.from(data[1].toString())
@@ -78,10 +79,23 @@ async function parseRestakedFromManager(eventData) {
     //   .div(BigNumber.from(data[3].toString())); // = 8.8 Klay
     // console.log('!! reward = ', reward.toString());
 
-    console.log('!! RestakedFromManager : ', totalRestaked, amount, totalStaking, totalShares);
+    console.log(
+      '!! RestakedFromManager : ',
+      totalRestaked,
+      amount,
+      increase,
+      totalStaking,
+      totalShares,
+    );
 
     try {
-      await models.rewards.createRewards(eventData.blockNumber, transactionHash, amount, totalShares);
+      await models.rewards.createRewards(
+        eventData.blockNumber,
+        transactionHash,
+        amount,
+        increase,
+        totalShares,
+      );
     } catch (e) {
       console.log('createRewards error', e);
     }
@@ -95,8 +109,8 @@ exports.getLastEvents = async function (toBlock, chainName) {
   try {
     await web3.eth
       .getPastLogs(
-        {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        // {fromBlock: 120127634, toBlock: 120128017, address: contracts},
+        // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
+        {fromBlock: 120155776, toBlock: 120156637, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
