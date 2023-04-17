@@ -72,7 +72,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 120116368, toBlock: 120117006, address: contracts},
+        {fromBlock: 120116368, toBlock: 120120706, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
