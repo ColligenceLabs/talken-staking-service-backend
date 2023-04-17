@@ -19,7 +19,7 @@ const web3 = getWeb3();
 const {BigNumber} = require('@ethersproject/bignumber');
 
 const contracts = [
-  '0x8c5A4e17870E880166B910214F56057FBA8420E3', // StKlay
+  '0x99f2a8cf094345DD5C07A61dA6E1f32b7FCBeA23', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
@@ -76,7 +76,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 120122161, toBlock: 120122376, address: contracts},
+        {fromBlock: 120127634, toBlock: 120128017, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
