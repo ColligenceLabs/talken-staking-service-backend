@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const health = require('./router/health');
-const rewards = require('./router/rewards');
+const histories = require('./router/histories');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./lib/swaggerDoc');
 const models = require("./models/index.js");
@@ -27,7 +27,7 @@ app.use(express.urlencoded({extended: true}));
 
 // app.use('/api/nft', nftRouter);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-app.use('/rewards', rewards);
+app.use('/histories', histories);
 app.use('/health', health);
 
 app.listen(port, () => {
