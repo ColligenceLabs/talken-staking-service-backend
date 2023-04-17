@@ -27,7 +27,7 @@ app.use(express.urlencoded({extended: true}));
 
 // app.use('/api/nft', nftRouter);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-app.use('/histories', histories);
+app.use('/api/histories', histories);
 app.use('/health', health);
 
 app.listen(port, () => {

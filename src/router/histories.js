@@ -1,27 +1,27 @@
 const express = require('express');
-const rewardsRouter = new express.Router();
-const rewardsCtrl = require('../controller/rewards.ctrl');
+const historyRouter = new express.Router();
+const historyCtrl = require('../controller/histories.ctrl');
 
 /**
  * @swagger
  * tags:
- *   name: Rewards
- *   description: rewards api
+ *   name: History
+ *   description: histories api
  */
 
 /**
  * @swagger
- * /rewards:
+ * /api/histories:
  *   get:
  *     tags:
- *       - Rewards
- *     description: rewards 조회
+ *       - History
+ *     description: histories 조회
  *     produces:
  *     - "application/json"
  *     responses:
  *       "200":
  *         description: "successful operation"
  */
-rewardsRouter.get('/', rewardsCtrl.test);
+historyRouter.get('/', historyCtrl.test);
 
-module.exports = rewardsRouter;
+module.exports = historyRouter;
