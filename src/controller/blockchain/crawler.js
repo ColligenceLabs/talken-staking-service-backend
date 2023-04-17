@@ -20,7 +20,7 @@ const {BigNumber} = require('@ethersproject/bignumber');
 
 const contracts = [
   '0xdE120C0f30daE7C6525De890436Dc99217E0326F', // StKlay
-  // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
+  '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
 function parseSharesChanged(eventData) {
