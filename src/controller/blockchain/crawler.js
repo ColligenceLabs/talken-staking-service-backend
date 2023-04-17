@@ -17,13 +17,14 @@ const models = require('../../models');
 const {getWeb3} = require('../../utils/helper');
 const web3 = getWeb3();
 const {BigNumber} = require('@ethersproject/bignumber');
+const {types} = require("../../config/constants");
 
 const contracts = [
   '0x8c5A4e17870E880166B910214F56057FBA8420E3', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
-function parseSharesChanged(eventData) {
+async function parseSharesChanged(eventData) {
   // StKlay Event : SharesChanged(address,uint256,uint256,uint256,uint8)
   if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
     let contractAddress = eventData.address.toLowerCase();
@@ -40,6 +41,20 @@ function parseSharesChanged(eventData) {
     console.log('!! SharesChanged : ', user, prevShares, shares, amount, changeType);
 
     let transactionHash = eventData.transactionHash;
+    try {
+      const history = new models.histories();
+      history.block_number = eventData.blockNumber;
+      history.tx_hash = transactionHash;
+      history.wallet = user;
+      history.prev_shares = prevShares;
+      history.shares = shares;
+      history.amount = amount;
+      history.type = types[changeType];
+
+      await history.save();
+    } catch (e) {
+      console.log('saveHistory error:', e);
+    }
   }
 }
 

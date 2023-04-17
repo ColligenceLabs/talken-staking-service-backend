@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const Rewards = sequelize.define("rewards", {
+    const Histories = sequelize.define("histories", {
             id: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
@@ -35,5 +35,5 @@ module.exports = (sequelize, Sequelize) => {
         }
     );
 
-    return Rewards;
+    return Histories;
 };
