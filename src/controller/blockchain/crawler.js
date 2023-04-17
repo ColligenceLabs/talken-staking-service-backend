@@ -24,10 +24,10 @@ const contracts = [
 ];
 
 function parseSharesChanged(eventData) {
-  // StKlay Event : SharesChanged(address,uint256,uint256)
-  if (eventData.topics[0] == '0xbe88f7e04cdfbf2eea1bad888fccf5cafb7ce21001180cdbb197cdd0707f6a41') {
+  // StKlay Event : SharesChanged(address,uint256,uint256,uint256)
+  if (eventData.topics[0] == '0xfb30a38da9eea4744f3c4f9105d3ad69de0c499f53b177fce3e4fbcb5452551e') {
     let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(['uint256', 'uint256'], eventData.data);
+    const data = web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], eventData.data);
 
     let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
     let prevShares = data[0];
@@ -72,7 +72,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 120115951, toBlock: 120117006, address: contracts},
+        {fromBlock: 120116368, toBlock: 120117006, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
