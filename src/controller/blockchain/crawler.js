@@ -32,7 +32,8 @@ function parseSharesChanged(eventData) {
     let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
     let prevShares = data[0];
     let shares = data[1];
-    console.log('!! SharesChanged : ', user, prevShares, shares);
+    let amount = data[2];
+    console.log('!! SharesChanged : ', user, prevShares, shares, amount);
 
     let transactionHash = eventData.transactionHash;
   }
@@ -71,7 +72,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
     await web3.eth
       .getPastLogs(
         // {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        {fromBlock: 119954149, toBlock: 119954768, address: contracts},
+        {fromBlock: 120115951, toBlock: 120117006, address: contracts},
         async (err, result) => {
           if (!err) {
             // console.log(result);
