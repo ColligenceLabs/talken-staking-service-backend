@@ -62,9 +62,9 @@ async function main() {
     await getChainEvents('klaytn', lastBlocks);
 
     // set timer to get events every 2 seconds
-    // setInterval(async function() {
-    //     await getChainEvents('klaytn', lastBlocks);
-    // }, 30000);
+    setInterval(async function() {
+        await getChainEvents('klaytn', lastBlocks);
+    }, 10000);
 }
 
 main();
