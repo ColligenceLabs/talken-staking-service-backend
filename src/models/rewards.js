@@ -26,6 +26,14 @@ module.exports = (sequelize, Sequelize) => {
             }
         }
     );
+    Rewards.removeAttribute('id');
+
+    Rewards.createRewards = async function (blockNumber, txHash, amount, totalShares) {
+        let query = `insert into rewards (wallet, shares, total_shares, amount, tx_hash, block_number, "createdAt")
+                     select wallet, shares, ${totalShares}, ${amount}, '${txHash}', ${blockNumber}, NOW()
+                       from histories where id in (select max(id) from histories group by wallet)`;
+        return await sequelize.query(query);
+    };
 
     return Rewards;
 };

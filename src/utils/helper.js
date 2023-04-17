@@ -36,3 +36,17 @@ exports.getExchange = async () => {
 exports.getWeb3 = () => {
     return new Web3(provider[parseInt(process.env.TARGET_NETWORK)]);
 }
+
+exports.getHeaders = (totalCount, page, perPage) => {
+    page = +page;
+    perPage = +perPage;
+    let pagesCount = Math.ceil(totalCount / perPage);
+
+    return {
+        'x_page': page,
+        'x_total_count': totalCount,
+        'x_pages_count': pagesCount,
+        'x_per_page': perPage,
+        'x_next_page': page === pagesCount ? page : page + 1,
+    };
+};

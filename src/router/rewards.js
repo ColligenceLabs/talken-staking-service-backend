@@ -1,27 +1,27 @@
 const express = require('express');
-const historyRouter = new express.Router();
-const historyCtrl = require('../controller/histories.ctrl');
+const rewardRouter = new express.Router();
+const rewardCtrl = require('../controller/rewards.ctrl');
 
 /**
  * @swagger
  * tags:
- *   name: History
- *   description: histories api
+ *   name: Reward
+ *   description: reward api
  */
 
 /**
  * @swagger
- * /api/history/{wallet}:
+ * /api/reward/{wallet}:
  *   get:
  *     tags:
- *       - History
- *     description: histories 조회
+ *       - Reward
+ *     description: reward 조회
  *     produces:
  *     - "application/json"
  *     parameters:
  *       - in: path
  *         name: wallet
- *         description: abc wallet address
+ *         description: wallet address
  *         schema:
  *           type: string
  *           example: '0x12345'
@@ -46,6 +46,6 @@ const historyCtrl = require('../controller/histories.ctrl');
  *       "200":
  *         description: "successful operation"
  */
-historyRouter.get('/:wallet', historyCtrl.getHistory);
+rewardRouter.get('/:wallet', rewardCtrl.getReward);
 
-module.exports = historyRouter;
+module.exports = rewardRouter;

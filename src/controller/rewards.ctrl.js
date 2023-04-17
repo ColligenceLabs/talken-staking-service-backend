@@ -26,7 +26,7 @@ module.exports = {
             return handlerError(req, res, e.message);
         }
     },
-    getHistory: async (req, res) => {
+    getReward: async (req, res) => {
         try {
             const sortBy = req.query.sortBy ?? "createdAt:DESC";
             const wallet = req.params.wallet ?? null;
@@ -34,13 +34,13 @@ module.exports = {
             let limit = +req.query.limit || 5;
             const options = {};
             options.where = { wallet };
-            const totCnt = await models.histories.count(options);
+            const totCnt = await models.rewards.count(options);
             const responseHeaders = getHeaders(totCnt, page, limit);
             options.limit = limit;
             options.offset = (page - 1) * limit;
             options.order = [sortBy.split(":")];
-            const histories = await models.histories.findAll(options);
-            return handlerSuccess(req, res, { histories, headers: responseHeaders });
+            const rewards = await models.rewards.findAll(options);
+            return handlerSuccess(req, res, { rewards, headers: responseHeaders });
         } catch (e) {
             console.log(e);
             return handlerError(req, res, e.message);
