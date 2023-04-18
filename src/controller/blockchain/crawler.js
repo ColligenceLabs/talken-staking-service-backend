@@ -20,7 +20,7 @@ const {BigNumber} = require('@ethersproject/bignumber');
 const {types} = require('../../config/constants');
 
 const contracts = [
-  '0xB52d73B2f86D63E1F707aC32cFD697fff2937954', // StKlay
+  '0x6AD500960Fee1a1452130851356985bF696549E3', // StKlay
   // '0x0013E63515fbCe7Ba92cF783c231C4844B97d118', // NodeManager
 ];
 
@@ -107,14 +107,13 @@ exports.getLastEvents = async function (toBlock, chainName) {
   let lastBlock = await models.lastblock.findByNetwork(process.env.TARGET_NETWORK ?? '1001');
   console.log(chainName, 'getLastEvents', lastBlock.blocknumber, toBlock);
   try {
-    const result = await web3.eth
-      .getPastLogs(
-        {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-        // {fromBlock: 120155776, toBlock: 120156637, address: contracts},
-      );
-      // .catch((e) => {
-      //   console.log('collection contract getEvents', e);
-      // });
+    const result = await web3.eth.getPastLogs(
+      {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
+      // {fromBlock: 120155776, toBlock: 120156637, address: contracts},
+    );
+    // .catch((e) => {
+    //   console.log('collection contract getEvents', e);
+    // });
     console.log('=====!!!!!', result);
     if (result) {
       lastBlock.blocknumber = toBlock + 1;
