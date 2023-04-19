@@ -6,4 +6,7 @@ module.exports = {
       type: Sequelize.STRING,
     });
   },
+  async down (queryInterface, Sequelize) {
+    return queryInterface.removeColumn("rewards", 'increase');
+  }
 };
