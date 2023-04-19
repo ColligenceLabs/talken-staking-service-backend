@@ -68,8 +68,8 @@ async function parseSharesChanged(eventData) {
         }
       } else totalstake = amount;
 
-      if (totalstake.lt(BigNumber.from('0')))
-        totalstake = BigNumber.from('0');
+      if (BigNumber.from(totalstake).lt(BigNumber.from('0')))
+        totalstake = BigNumber.from('0').toString();
 
       try {
         const history = new models.histories();
