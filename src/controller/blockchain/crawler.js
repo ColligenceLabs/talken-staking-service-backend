@@ -25,138 +25,151 @@ const contracts = [
 ];
 
 async function parseSharesChanged(eventData) {
-  // StKlay Event : SharesChanged(address,uint256,uint256,uint256,uint8)
-  if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
-    let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(
-      ['uint256', 'uint256', 'uint256', 'uint8'],
-      eventData.data,
-    );
+  try {
+    // StKlay Event : SharesChanged(address,uint256,uint256,uint256,uint8)
+    if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
+      let contractAddress = eventData.address.toLowerCase();
+      const data = web3.eth.abi.decodeParameters(
+          ['uint256', 'uint256', 'uint256', 'uint8'],
+          eventData.data,
+      );
 
-    let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
-    let prevShares = data[0];
-    let shares = data[1];
-    let amount = data[2];
-    let changeType = data[3]; // 1 stake, 2 unstake, 3 cancel, 4 transfer
-    console.log('!! SharesChanged : ', user, prevShares, shares, amount, changeType);
+      let user = web3.eth.abi.decodeParameters(['address'], eventData.topics[1])[0];
+      let prevShares = data[0];
+      let shares = data[1];
+      let amount = data[2];
+      let changeType = data[3]; // 1 stake, 2 unstake, 3 cancel, 4 transfer
+      console.log('!! SharesChanged : ', user, prevShares, shares, amount, changeType);
 
-    let transactionHash = eventData.transactionHash;
-    const lastHistory = await models.histories.findOne({
-      where: {wallet: user},
-      order: [['id', 'desc']],
-    });
-    let totalstake;
-    if (lastHistory) {
-      if (changeType === '1' || changeType === '3')
-        totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
-          .add(BigNumber.from(amount))
-          .toString();
-      else if (changeType === '2')
-        totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
-          .sub(BigNumber.from(amount))
-          .toString();
-      else if (changeType === '4') {
-        if (BigNumber.from(prevShares).gt(BigNumber.from(shares)))
+      let transactionHash = eventData.transactionHash;
+      const lastHistory = await models.histories.findOne({
+        where: {wallet: user},
+        order: [['id', 'desc']],
+      });
+      let totalstake;
+      if (lastHistory) {
+        if (changeType === '1' || changeType === '3')
           totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
-            .sub(BigNumber.from(amount))
-            .toString();
-        else
+              .add(BigNumber.from(amount))
+              .toString();
+        else if (changeType === '2')
           totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
-            .add(BigNumber.from(amount))
-            .toString();
+              .sub(BigNumber.from(amount))
+              .toString();
+        else if (changeType === '4') {
+          if (BigNumber.from(prevShares).gt(BigNumber.from(shares)))
+            totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+                .sub(BigNumber.from(amount))
+                .toString();
+          else
+            totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+                .add(BigNumber.from(amount))
+                .toString();
+        }
+      } else totalstake = amount;
+      try {
+        const history = new models.histories();
+        history.block_number = eventData.blockNumber;
+        history.tx_hash = transactionHash;
+        history.wallet = user;
+        history.prev_shares = prevShares;
+        history.shares = shares;
+        history.amount = amount;
+        history.type = types[changeType];
+        history.totalstake = totalstake;
+
+        await history.save();
+      } catch (e) {
+        console.log('saveHistory error:', e);
       }
-    } else totalstake = amount;
-    try {
-      const history = new models.histories();
-      history.block_number = eventData.blockNumber;
-      history.tx_hash = transactionHash;
-      history.wallet = user;
-      history.prev_shares = prevShares;
-      history.shares = shares;
-      history.amount = amount;
-      history.type = types[changeType];
-      history.totalstake = totalstake;
-
-      await history.save();
-    } catch (e) {
-      console.log('saveHistory error:', e);
     }
+  } catch (e) {
+    throw e;
   }
 }
 
 async function parseRestakedFromManager(eventData) {
-  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
-  if (eventData.topics[0] == '0x47c355b9d84fb97b1b36daa506b9fc8f856bb70659ec082640a13dc944dee214') {
-    let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(
-      ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
-      eventData.data,
-    );
-
-    let totalRestaked = data[0];
-    let amount = data[1];
-    let increase = data[2];
-    let totalStaking = data[3];
-    let totalShares = data[4];
-    let transactionHash = eventData.transactionHash;
-
-    // const reward = BigNumber.from(data[1].toString())
-    //   .mul(BigNumber.from('1000000000000000000000000000')) // <-- prevShares
-    //   .div(BigNumber.from(data[3].toString())); // = 8.8 Klay
-    // console.log('!! reward = ', reward.toString());
-
-    console.log(
-      '!! RestakedFromManager : ',
-      totalRestaked,
-      amount,
-      increase,
-      totalStaking,
-      totalShares,
-    );
-
-    try {
-      await models.rewards.createRewards(
-        eventData.blockNumber,
-        transactionHash,
-        amount,
-        increase,
-        totalShares,
+  try {
+    // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
+    if (eventData.topics[0] == '0x47c355b9d84fb97b1b36daa506b9fc8f856bb70659ec082640a13dc944dee214') {
+      let contractAddress = eventData.address.toLowerCase();
+      const data = web3.eth.abi.decodeParameters(
+          ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
+          eventData.data,
       );
-    } catch (e) {
-      console.log('createRewards error', e);
+
+      let totalRestaked = data[0];
+      let amount = data[1];
+      let increase = data[2];
+      let totalStaking = data[3];
+      let totalShares = data[4];
+      let transactionHash = eventData.transactionHash;
+
+      // const reward = BigNumber.from(data[1].toString())
+      //   .mul(BigNumber.from('1000000000000000000000000000')) // <-- prevShares
+      //   .div(BigNumber.from(data[3].toString())); // = 8.8 Klay
+      // console.log('!! reward = ', reward.toString());
+
+      console.log(
+          '!! RestakedFromManager : ',
+          totalRestaked,
+          amount,
+          increase,
+          totalStaking,
+          totalShares,
+      );
+
+      try {
+        await models.rewards.createRewards(
+            eventData.blockNumber,
+            transactionHash,
+            amount,
+            increase,
+            totalShares,
+        );
+      } catch (e) {
+        console.log('createRewards error', e);
+      }
     }
+  } catch (e) {
+    throw e;
   }
 }
 
 async function parseTransfer(eventData) {
-  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
-  if (eventData.topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
-    let contractAddress = eventData.address.toLowerCase();
-    const data = web3.eth.abi.decodeParameters(['uint256'], eventData.data);
+  try {
+    // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
+    if (eventData.topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
+      let contractAddress = eventData.address.toLowerCase();
+      const data = web3.eth.abi.decodeParameters(['uint256'], eventData.data);
 
-    let from = eventData.topics[1];
-    let to = eventData.topics[2];
-    let value = data[0];
-    let transactionHash = eventData.transactionHash;
+      let from = eventData.topics[1];
+      let to = eventData.topics[2];
+      let value = data[0];
+      let transactionHash = eventData.transactionHash;
 
-    if (
-      from !== '0x0000000000000000000000000000000000000000000000000000000000000000' &&
-      to !== '0x0000000000000000000000000000000000000000000000000000000000000000'
-    ) {
-      console.log('!! Transfer : ', from, to, value);
+      if (
+          from !== '0x0000000000000000000000000000000000000000000000000000000000000000' &&
+          to !== '0x0000000000000000000000000000000000000000000000000000000000000000'
+      ) {
+        console.log('!! Transfer : ', from, to, value);
 
-      // TODO : DB 작업
-      // Transfer 이벤트 저장
-      // from totalstake 에서 value 빼기, to totalstake 에 더하기
+        // TODO : DB 작업
+        // Transfer 이벤트 저장
+        // from totalstake 에서 value 빼기, to totalstake 에 더하기
+      }
     }
+  } catch (e) {
+    throw e;
   }
 }
 
 exports.getLastEvents = async function (toBlock, chainName) {
-  console.log('=======getLastEvents start');
-  let lastBlock = await models.lastblock.findByNetwork(process.env.TARGET_NETWORK ?? '1001');
-  console.log(chainName, 'getLastEvents', lastBlock.blocknumber, toBlock);
   try {
+    console.log('=======getLastEvents start');
+    let lastBlock = await models.lastblock.findByNetwork(process.env.TARGET_NETWORK ?? '1001');
+    console.log(chainName, 'getLastEvents', lastBlock.blocknumber, toBlock);
+
     const result = await web3.eth.getPastLogs(
       {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
       // {fromBlock: 120214499, toBlock: 120228768, address: contracts},

@@ -33,9 +33,9 @@ async function loadConfFromDB() {
 
 async function getChainEvents(chainName, lastBlocks) {
     if (lastBlocks.event[chainName]) {
-        const web3 = getWeb3();
-        if (!web3) return;
         try {
+            const web3 = getWeb3();
+            if (!web3) return;
             let toBlock = await web3.eth.getBlockNumber();
             if (lastBlocks.event[chainName]) {
                 const lastBlockNumber = parseInt(lastBlocks.event[chainName]);
@@ -90,20 +90,24 @@ async function transferRewards() {
 }
 
 async function main() {
-    // init
-    const lastBlocks = await loadConfFromDB();
-    console.log('lastBlocks', lastBlocks);
-    await getChainEvents('klaytn', lastBlocks);
-
-    // set timer to get events every 2 seconds
-    setInterval(async function() {
+    try {
+        // init
+        const lastBlocks = await loadConfFromDB();
+        console.log('lastBlocks', lastBlocks);
         await getChainEvents('klaytn', lastBlocks);
-    }, 10000);
 
-    // transfer rewards
-    setInterval(async function() {
-        await transferRewards();
-    }, 5 * 60 * 1000);
+        // set timer to get events every 2 seconds
+        setInterval(async function() {
+            await getChainEvents('klaytn', lastBlocks);
+        }, 10000);
+
+        // transfer rewards
+        setInterval(async function() {
+            await transferRewards();
+        }, 5 * 60 * 1000);
+    } catch (e) {
+        console.log('crawler error', e);
+    }
 }
 
 main();
