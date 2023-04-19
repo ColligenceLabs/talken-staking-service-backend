@@ -67,6 +67,10 @@ async function parseSharesChanged(eventData) {
                 .toString();
         }
       } else totalstake = amount;
+
+      if (totalstake.lt(BigNumber.from('0')))
+        totalstake = BigNumber.from('0');
+
       try {
         const history = new models.histories();
         history.block_number = eventData.blockNumber;
