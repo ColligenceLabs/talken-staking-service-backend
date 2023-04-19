@@ -58,35 +58,39 @@ async function getChainEvents(chainName, lastBlocks) {
 }
 
 async function transferRewards() {
-    console.log('transfer rewards');
-    const web3 = getKlaytnKmsWeb3();
-    const accounts = await web3.eth.getAccounts();
-    const balance = await web3.eth.getBalance(accounts[0]);
+    try {
+        console.log('transfer rewards');
+        const web3 = getKlaytnKmsWeb3();
+        const accounts = await web3.eth.getAccounts();
+        const balance = await web3.eth.getBalance(accounts[0]);
 
-    const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
-    const nonce = await web3.eth.getTransactionCount(accounts[0]);
-    const gasPrice = await web3.eth.getGasPrice();
+        const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
+        const nonce = await web3.eth.getTransactionCount(accounts[0]);
+        const gasPrice = await web3.eth.getGasPrice();
 
-    const value = web3.utils.toWei('0.1', 'ether');
-    const gasLimit = await web3.eth.estimateGas({
-        to: toAddress,
-        from: accounts[0],
-        value: value
-    }).catch((e) => {
-        console.log(e);
-    }); // the used gas for the simulated call/transaction (,,21000)
-    console.log('2222222', accounts, balance);
-    const txObject = {
-        nonce: nonce,
-        gasPrice: gasPrice,
-        gasLimit: gasLimit,
-        to: toAddress,
-        from: accounts[0],
-        value: value
-    };
-    // console.log('333333', nonce, gasPrice, gasLimit, value);
-    const {status, transactionHash, message} = await web3.eth.sendTransaction(txObject);
-    console.log(status, transactionHash, message);
+        const value = web3.utils.toWei('0.1', 'ether');
+        const gasLimit = await web3.eth.estimateGas({
+            to: toAddress,
+            from: accounts[0],
+            value: value
+        }).catch((e) => {
+            console.log(e);
+        }); // the used gas for the simulated call/transaction (,,21000)
+        // console.log('2222222', accounts, balance);
+        const txObject = {
+            nonce: nonce,
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
+            to: toAddress,
+            from: accounts[0],
+            value: value
+        };
+        // console.log('333333', nonce, gasPrice, gasLimit, value);
+        const {status, transactionHash, message} = await web3.eth.sendTransaction(txObject);
+        console.log(status, transactionHash, message);
+    } catch (e) {
+        console.log('reward transfer fail', e);
+    }
 }
 
 async function main() {
