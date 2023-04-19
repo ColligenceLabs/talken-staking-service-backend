@@ -41,21 +41,31 @@ async function parseSharesChanged(eventData) {
     console.log('!! SharesChanged : ', user, prevShares, shares, amount, changeType);
 
     let transactionHash = eventData.transactionHash;
-    const lastHistory = await models.histories.findOne({where: {wallet: user}}, {order: [['id', 'desc']]});
+    const lastHistory = await models.histories.findOne({
+      where: {wallet: user},
+      order: [['id', 'desc']],
+    });
     let totalstake;
     if (lastHistory) {
-      if (changeType === 1 || changeType === 3)
-        totalstake = BigNumber.from(lastHistory.totalstake ?? '0').add(BigNumber.from(amount)).toString();
-      else if (changeType === 2)
-        totalstake = BigNumber.from(lastHistory.totalstake ?? '0').sub(BigNumber.from(amount)).toString();
-      else if (changeType === 4) {
+      if (changeType === '1' || changeType === '3')
+        totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+          .add(BigNumber.from(amount))
+          .toString();
+      else if (changeType === '2')
+        totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+          .sub(BigNumber.from(amount))
+          .toString();
+      else if (changeType === '4') {
         if (BigNumber.from(prevShares).gt(BigNumber.from(shares)))
-          totalstake = BigNumber.from(lastHistory.totalstake ?? '0').sub(BigNumber.from(amount)).toString();
+          totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+            .sub(BigNumber.from(amount))
+            .toString();
         else
-          totalstake = BigNumber.from(lastHistory.totalstake ?? '0').add(BigNumber.from(amount)).toString();
+          totalstake = BigNumber.from(lastHistory.totalstake ?? '0')
+            .add(BigNumber.from(amount))
+            .toString();
       }
-    } else
-      totalstake = amount;
+    } else totalstake = amount;
     try {
       const history = new models.histories();
       history.block_number = eventData.blockNumber;
