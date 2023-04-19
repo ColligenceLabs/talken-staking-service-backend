@@ -102,6 +102,30 @@ async function parseRestakedFromManager(eventData) {
   }
 }
 
+async function parseTransfer(eventData) {
+  // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
+  if (eventData.topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
+    let contractAddress = eventData.address.toLowerCase();
+    const data = web3.eth.abi.decodeParameters(['uint256'], eventData.data);
+
+    let from = eventData.topics[1];
+    let to = eventData.topics[2];
+    let value = data[0];
+    let transactionHash = eventData.transactionHash;
+
+    if (
+      from !== '0x0000000000000000000000000000000000000000000000000000000000000000' &&
+      to !== '0x0000000000000000000000000000000000000000000000000000000000000000'
+    ) {
+      console.log('!! Transfer : ', from, to, value);
+
+      // TODO : DB 작업
+      // Transfer 이벤트 저장
+      // from totalstake 에서 value 빼기, to totalstake 에 더하기
+    }
+  }
+}
+
 exports.getLastEvents = async function (toBlock, chainName) {
   console.log('=======getLastEvents start');
   let lastBlock = await models.lastblock.findByNetwork(process.env.TARGET_NETWORK ?? '1001');
@@ -109,7 +133,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
   try {
     const result = await web3.eth.getPastLogs(
       {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
-      // {fromBlock: 120155776, toBlock: 120156637, address: contracts},
+      // {fromBlock: 120214499, toBlock: 120228768, address: contracts},
     );
     // .catch((e) => {
     //   console.log('collection contract getEvents', e);
@@ -127,6 +151,7 @@ exports.getLastEvents = async function (toBlock, chainName) {
           if (result[i].topics) {
             await parseSharesChanged(result[i]);
             await parseRestakedFromManager(result[i]);
+            await parseTransfer(result[i]);
           }
         }
       }
