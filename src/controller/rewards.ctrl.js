@@ -3,6 +3,7 @@ const {getPolygonWeb3} = require('../utils/awskms');
 const collectionAbi = require('../config/abi/collection.json');
 const models = require('../models');
 const {getHeaders} = require('../utils/helper');
+const {BigNumber} = require("@ethersproject/bignumber");
 
 module.exports = {
   transfer: async (req, res) => {
@@ -46,4 +47,23 @@ module.exports = {
       return handlerError(req, res, e.message);
     }
   },
+  getTotalReward: async (req, res) => {
+    try {
+      const wallet = req.params.wallet ?? null;
+      const options = {};
+      options.where = {wallet};
+      const rewards = await models.rewards.findAll(options);
+      let totalReward = BigNumber.from('0');
+      if (rewards) {
+        for (let i = 0; i < rewards.length; i++) {
+          const reward = BigNumber.from(rewards[i].amount).mul(BigNumber.from(rewards[i].shares)).div(BigNumber.from(rewards[i].total_shares));
+          totalReward = totalReward.add(reward);
+        }
+      }
+      return handlerSuccess(req, res, totalReward.toString());
+    } catch (e) {
+      console.log(e);
+      return handlerError(req, res, e.message);
+    }
+  }
 };

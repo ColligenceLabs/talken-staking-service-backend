@@ -48,4 +48,26 @@ const rewardCtrl = require('../controller/rewards.ctrl');
  */
 rewardRouter.get('/:wallet', rewardCtrl.getReward);
 
+/**
+ * @swagger
+ * /api/reward/total/{wallet}:
+ *   get:
+ *     tags:
+ *       - Reward
+ *     description: reward 조회
+ *     produces:
+ *     - "application/json"
+ *     parameters:
+ *       - in: path
+ *         name: wallet
+ *         description: wallet address
+ *         schema:
+ *           type: string
+ *           example: '0x12345'
+ *     responses:
+ *       "200":
+ *         description: "successful operation"
+ */
+rewardRouter.get('/total/:wallet', rewardCtrl.getTotalReward);
+
 module.exports = rewardRouter;
