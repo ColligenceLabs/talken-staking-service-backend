@@ -86,7 +86,9 @@ async function transferRewards() {
             value: value
         };
         // console.log('333333', nonce, gasPrice, gasLimit, value);
-        const {status, transactionHash, message} = await web3.eth.sendTransaction(txObject);
+        const {status, transactionHash, message} =
+            await web3.eth.sendTransaction(txObject).catch((e) => {console.log('sendTransaction error', e)});
+
         console.log(status, transactionHash, message);
     } catch (e) {
         console.log('reward transfer fail', e);

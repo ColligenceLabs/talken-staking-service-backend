@@ -15,7 +15,7 @@
 // get events
 const models = require('../../models');
 const {getWeb3} = require('../../utils/helper');
-const web3 = getWeb3();
+
 const {BigNumber} = require('@ethersproject/bignumber');
 const {types} = require('../../config/constants');
 
@@ -26,6 +26,7 @@ const contracts = [
 
 async function parseSharesChanged(eventData) {
   try {
+    const web3 = getWeb3();
     // StKlay Event : SharesChanged(address,uint256,uint256,uint256,uint8)
     if (eventData.topics[0] == '0x0e4033ca59159fed9e716efba93cc8fc4e08e122cce662e9449ef210cca29411') {
       let contractAddress = eventData.address.toLowerCase();
@@ -94,6 +95,7 @@ async function parseSharesChanged(eventData) {
 
 async function parseRestakedFromManager(eventData) {
   try {
+    const web3 = getWeb3();
     // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
     if (eventData.topics[0] == '0x47c355b9d84fb97b1b36daa506b9fc8f856bb70659ec082640a13dc944dee214') {
       let contractAddress = eventData.address.toLowerCase();
@@ -142,6 +144,7 @@ async function parseRestakedFromManager(eventData) {
 
 async function parseTransfer(eventData) {
   try {
+    const web3 = getWeb3();
     // StKlay Event : RestakedFromManager(uint256,uint256,uint256,uint256,uint256)
     if (eventData.topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
       let contractAddress = eventData.address.toLowerCase();
@@ -171,16 +174,17 @@ async function parseTransfer(eventData) {
 exports.getLastEvents = async function (toBlock, chainName) {
   try {
     console.log('=======getLastEvents start');
+    const web3 = getWeb3();
     let lastBlock = await models.lastblock.findByNetwork(process.env.TARGET_NETWORK ?? '1001');
     console.log(chainName, 'getLastEvents', lastBlock.blocknumber, toBlock);
 
     const result = await web3.eth.getPastLogs(
       {fromBlock: lastBlock.blocknumber, toBlock: toBlock, address: contracts},
       // {fromBlock: 120214499, toBlock: 120228768, address: contracts},
-    );
-    // .catch((e) => {
-    //   console.log('collection contract getEvents', e);
-    // });
+    )
+    .catch((e) => {
+      console.log('collection contract getEvents', e);
+    });
     console.log('=====!!!!!', result);
     if (result) {
       lastBlock.blocknumber = toBlock + 1;
