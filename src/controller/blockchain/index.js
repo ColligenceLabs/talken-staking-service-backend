@@ -151,18 +151,14 @@ async function main() {
     await getChainEvents('klaytn', lastBlocks);
 
     // set timer to get events every 2 seconds
-    // setInterval(async function() {
-    //     await getChainEvents('klaytn', lastBlocks);
-    // }, 10000);
-    // set timer to get events every 2 seconds
     setInterval(async function () {
       await getChainEvents('klaytn', lastBlocks);
     }, 60 * 1000);
 
     // transfer rewards
-    setInterval(async function () {
-      await transferRewards();
-    }, 5 * 60 * 1000);
+    // setInterval(async function () {
+    //   await transferRewards();
+    // }, 5 * 60 * 1000);
   } catch (e) {
     console.log('crawler error', e);
   }
