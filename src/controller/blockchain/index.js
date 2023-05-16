@@ -61,30 +61,55 @@ async function transferRewards() {
     const accounts = await web3.eth.getAccounts();
     const balance = await web3.eth.getBalance(accounts[0]);
     try {
-        console.log('transfer rewards');
-        const web3 = getKlaytnKmsWeb3();
-        const accounts = await web3.eth.getAccounts().catch((e) => {
-            console.log('getAccounts', e)
-            throw e;
-        });
-        const balance = await web3.eth.getBalance(accounts[0]).catch((e) => {
-            console.log('getBalance', e)
-            throw e;
-        });
+      console.log('transfer rewards');
+      const web3 = getKlaytnKmsWeb3();
+      const accounts = await web3.eth.getAccounts().catch((e) => {
+        console.log('getAccounts', e);
+        throw e;
+      });
+      const balance = await web3.eth.getBalance(accounts[0]).catch((e) => {
+        console.log('getBalance', e);
+        throw e;
+      });
 
-    const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
-    const nonce = await web3.eth.getTransactionCount(accounts[0]);
-    const gasPrice = await web3.eth.getGasPrice();
-        const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
-        const nonce = await web3.eth.getTransactionCount(accounts[0]).catch((e) => {
-            console.log('getTransactionCount', e)
-            throw e;
-        });
-        const gasPrice = await web3.eth.getGasPrice().catch((e) => {
-            console.log('getGasPrice', e)
-            throw e;
-        });
+      // const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
+      // const nonce = await web3.eth.getTransactionCount(accounts[0]);
+      // const gasPrice = await web3.eth.getGasPrice();
+      const toAddress = '0x57fBfa7C25D5C701E86484E19BFb9df9dCAe6D40';
+      const nonce = await web3.eth.getTransactionCount(accounts[0]).catch((e) => {
+        console.log('getTransactionCount', e);
+        throw e;
+      });
+      const gasPrice = await web3.eth.getGasPrice().catch((e) => {
+        console.log('getGasPrice', e);
+        throw e;
+      });
 
+      const value = web3.utils.toWei('0.1', 'ether');
+      const gasLimit = await web3.eth
+        .estimateGas({
+          to: toAddress,
+          from: accounts[0],
+          value: value,
+        })
+        .catch((e) => {
+          console.log(e);
+        }); // the used gas for the simulated call/transaction (,,21000)
+      // console.log('2222222', accounts, balance);
+      const txObject = {
+        nonce: nonce,
+        gasPrice: gasPrice,
+        gasLimit: gasLimit,
+        to: toAddress,
+        from: accounts[0],
+        value: value,
+      };
+      // console.log('333333', nonce, gasPrice, gasLimit, value);
+      const {status, transactionHash, message} = await web3.eth.sendTransaction(txObject);
+      console.log(status, transactionHash, message);
+    } catch (e) {
+      console.log('reward transfer fail', e);
+    }
     const value = web3.utils.toWei('0.1', 'ether');
     const gasLimit = await web3.eth
       .estimateGas({
@@ -105,39 +130,17 @@ async function transferRewards() {
       value: value,
     };
     // console.log('333333', nonce, gasPrice, gasLimit, value);
-    const {status, transactionHash, message} = await web3.eth.sendTransaction(txObject);
+    const {status, transactionHash, message} = await web3.eth
+      .sendTransaction(txObject)
+      .catch((e) => {
+        console.log('sendTransaction error', e);
+        throw e;
+      });
+
     console.log(status, transactionHash, message);
   } catch (e) {
     console.log('reward transfer fail', e);
   }
-        const value = web3.utils.toWei('0.1', 'ether');
-        const gasLimit = await web3.eth.estimateGas({
-            to: toAddress,
-            from: accounts[0],
-            value: value
-        }).catch((e) => {
-            console.log(e);
-        }); // the used gas for the simulated call/transaction (,,21000)
-        // console.log('2222222', accounts, balance);
-        const txObject = {
-            nonce: nonce,
-            gasPrice: gasPrice,
-            gasLimit: gasLimit,
-            to: toAddress,
-            from: accounts[0],
-            value: value
-        };
-        // console.log('333333', nonce, gasPrice, gasLimit, value);
-        const {status, transactionHash, message} =
-            await web3.eth.sendTransaction(txObject).catch((e) => {
-                console.log('sendTransaction error', e);
-                throw e;
-            });
-
-        console.log(status, transactionHash, message);
-    } catch (e) {
-        console.log('reward transfer fail', e);
-    }
 }
 
 async function main() {
@@ -151,10 +154,10 @@ async function main() {
     // setInterval(async function() {
     //     await getChainEvents('klaytn', lastBlocks);
     // }, 10000);
-        // set timer to get events every 2 seconds
-        setInterval(async function() {
-            await getChainEvents('klaytn', lastBlocks);
-        }, 60 * 1000);
+    // set timer to get events every 2 seconds
+    setInterval(async function () {
+      await getChainEvents('klaytn', lastBlocks);
+    }, 60 * 1000);
 
     // transfer rewards
     setInterval(async function () {
@@ -163,13 +166,6 @@ async function main() {
   } catch (e) {
     console.log('crawler error', e);
   }
-        // transfer rewards
-        // setInterval(async function() {
-        //     await transferRewards();
-        // }, 10 * 60 * 1000);
-    } catch (e) {
-        console.log('crawler error', e);
-    }
 }
 
 main();
