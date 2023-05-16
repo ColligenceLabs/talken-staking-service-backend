@@ -34,7 +34,12 @@ exports.getExchange = async () => {
 }
 
 exports.getWeb3 = () => {
-    return new Web3(provider[parseInt(process.env.TARGET_NETWORK)]);
+    try {
+        return new Web3(provider[parseInt(process.env.TARGET_NETWORK)]);
+    } catch (e) {
+        console.log('getWeb3', e);
+        throw e;
+    }
 }
 
 exports.getHeaders = (totalCount, page, perPage) => {
