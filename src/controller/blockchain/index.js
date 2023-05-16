@@ -146,9 +146,9 @@ async function transferRewards() {
 async function main() {
   try {
     // init
-    // const lastBlocks = await loadConfFromDB();
-    // console.log('lastBlocks', lastBlocks);
-    // await getChainEvents('klaytn', lastBlocks);
+    const lastBlocks = await loadConfFromDB();
+    console.log('lastBlocks', lastBlocks);
+    await getChainEvents('klaytn', lastBlocks);
 
     // set timer to get events every 2 seconds
     // setInterval(async function() {
